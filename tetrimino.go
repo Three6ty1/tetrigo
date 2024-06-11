@@ -10,10 +10,10 @@ type Vector struct {
 type Orientation int32
 
 const (
-	Original Orientation = iota
-	Right
-	OneHundredEighty
-	Left
+	O0 Orientation = iota
+	O90
+	O180
+	O270
 )
 
 type Piece int32
@@ -30,12 +30,27 @@ const (
 
 type Tetrimino struct {
 	piece       Piece
-	locked      bool
 	position    Vector
 	orientation Orientation
 	sprite      *ebiten.Image
 }
 
+func (t Tetrimino) Draw(screen *ebiten.Image) {
+
+}
+
 func (t Tetrimino) RotateLeft(pf PlayField) {
+
+}
+
+func (t Tetrimino) RotateRight(pf PlayField) {
+
+}
+
+func (t Tetrimino) GetPosition() {
+
+}
+
+func (t Tetrimino) SetPosition() {
 
 }

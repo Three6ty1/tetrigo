@@ -3,6 +3,7 @@ package game
 import (
 	"log"
 
+	"github.com/Three6ty1/tetrigo/helper"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
@@ -23,7 +24,9 @@ const (
 )
 
 type PlayField struct {
-	stack [][]Mino
+	stack          [][]Mino
+	minoOffset     float64
+	playfieldStart helper.Vector
 }
 
 func NewPlayField() *PlayField {
@@ -40,25 +43,33 @@ func NewPlayField() *PlayField {
 	return pf
 }
 
-func (pf PlayField) Draw(screen *ebiten.Image) {
+func (pf *PlayField) Draw(screen *ebiten.Image, gameScale float64) {
 	boardImg, _, err := ebitenutil.NewImageFromFile("./assets/board.png")
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(0.5, 0.5)
-	scale := ebiten.Monitor().DeviceScaleFactor()
-	op.GeoM.Scale(scale, scale)
+	op.GeoM.Scale(gameScale, gameScale)
 
-	bw := boardImg.Bounds().Dx()
-	bh := boardImg.Bounds().Dy()
-	sw := screen.Bounds().Dx()
+	bw := float64(boardImg.Bounds().Dx())
+	bh := float64(boardImg.Bounds().Dy())
+	sw := float64(screen.Bounds().Dx())
 
 	// 4 because scale means the original bounds is 2x larger, therefore we need /2 again
-	op.GeoM.Translate(float64(sw/2-bw/4), float64(bh/16))
+	startX := float64(sw/2 - (bw/2)*gameScale)
+	startY := float64((bh / 8) * gameScale)
+	op.GeoM.Translate(startX, startY)
 
 	screen.DrawImage(boardImg, op)
+
+	if pf.minoOffset == 0.0 {
+		// Set the playfield variables during runtime
+		// Board with borders is 12 * 22
+		pf.minoOffset = bw * gameScale / 12
+		pf.playfieldStart = *helper.NewVector(startX, startY)
+	}
 }
 
 func (pf PlayField) IsColliding(t Tetrimino) bool {

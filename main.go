@@ -1,23 +1,23 @@
 package main
 
 import (
-	_ "image/png"
 	"log"
 
 	"github.com/Three6ty1/tetrigo/game"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-var LPiece *ebiten.Image
+var GameScale = 0.5
 
 type Game struct {
 	tick uint
 	// queue
+	// held tetrimino
 	lines     *uint32
 	state     GameState
 	playfield *game.PlayField
+	active    *game.Tetrimino
 }
 
 type GameState int32
@@ -27,11 +27,6 @@ const (
 	win
 	lose
 )
-
-func init() {
-	LPiece, _, _ = ebitenutil.NewImageFromFile("./assets/l.png")
-
-}
 
 func (g *Game) Update() error {
 	g.tick++
@@ -48,7 +43,8 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.playfield.Draw(screen)
+	g.playfield.Draw(screen, GameScale)
+	g.active.Draw(screen, g.playfield, GameScale)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -65,6 +61,7 @@ func main() {
 		lines:     &lines,
 		state:     playing,
 		playfield: game.NewPlayField(),
+		active:    game.NewTetrimino(game.T),
 	}
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)

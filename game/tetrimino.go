@@ -8,6 +8,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+const T = true
+const F = false
+
 type Tetrimino interface {
 	Draw(screen *ebiten.Image, pf *PlayField, gameScale float64)
 	GetPosition() *types.Vector
@@ -34,17 +37,17 @@ func NewTetrimino(p types.Piece) Tetrimino {
 	var t Tetrimino
 	switch p {
 	case types.SPiece:
-
+		t = NewSPiece()
 	case types.ZPiece:
-
+		t = NewZPiece()
 	case types.LPiece:
-
+		t = NewLPiece()
 	case types.JPiece:
-
+		t = NewJPiece()
 	case types.TPiece:
-
+		t = NewTPiece()
 	case types.OPiece:
-
+		t = NewOPiece()
 	case types.IPiece:
 		t = NewIPiece()
 	}

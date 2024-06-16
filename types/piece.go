@@ -2,8 +2,7 @@ package types
 
 type Mino int32
 
-// These are equivalents
-
+// These two are equivalents
 const (
 	green Mino = iota
 	red

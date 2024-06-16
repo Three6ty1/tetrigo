@@ -11,9 +11,6 @@ type IPiece struct {
 	Piece
 }
 
-const T = true
-const F = false
-
 func NewIPiece() *IPiece {
 	s, _, err := ebitenutil.NewImageFromFile("./assets/I.png")
 	if err != nil {

@@ -1,4 +1,4 @@
-package helper
+package types
 
 type Vector struct {
 	X float64

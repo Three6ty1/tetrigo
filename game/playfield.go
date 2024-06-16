@@ -3,37 +3,24 @@ package game
 import (
 	"log"
 
-	"github.com/Three6ty1/tetrigo/helper"
+	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 var boardImg *ebiten.Image
 
-type Mino int32
-
-const (
-	blue Mino = iota
-	green
-	lightBlue
-	orange
-	purple
-	red
-	yellow
-	empty
-)
-
 type PlayField struct {
-	stack          [][]Mino
+	stack          [][]types.Mino
 	minoOffset     float64
-	playfieldStart helper.Vector
+	playfieldStart types.Vector
 }
 
 func NewPlayField() *PlayField {
-	s := make([][]Mino, 20)
+	s := make([][]types.Mino, 20)
 
 	for i := range s {
-		s[i] = make([]Mino, 10)
+		s[i] = make([]types.Mino, 10)
 	}
 
 	pf := &PlayField{
@@ -44,12 +31,14 @@ func NewPlayField() *PlayField {
 }
 
 func (pf *PlayField) Draw(screen *ebiten.Image, gameScale float64) {
-	boardImg, _, err := ebitenutil.NewImageFromFile("./assets/board.png")
+	if boardImg == nil {
+		newImg, _, err := ebitenutil.NewImageFromFile("./assets/board.png")
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	if err != nil {
-		log.Fatal(err)
+		boardImg = newImg
 	}
-
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(gameScale, gameScale)
 
@@ -68,7 +57,7 @@ func (pf *PlayField) Draw(screen *ebiten.Image, gameScale float64) {
 		// Set the playfield variables during runtime
 		// Board with borders is 12 * 22
 		pf.minoOffset = bw * gameScale / 12
-		pf.playfieldStart = *helper.NewVector(startX, startY)
+		pf.playfieldStart = *types.NewVector(startX, startY)
 	}
 }
 

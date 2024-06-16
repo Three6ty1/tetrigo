@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Three6ty1/tetrigo/game"
+	"github.com/Three6ty1/tetrigo/types"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -17,7 +18,7 @@ type Game struct {
 	lines     *uint32
 	state     GameState
 	playfield *game.PlayField
-	active    *game.Tetrimino
+	active    game.Tetrimino
 }
 
 type GameState int32
@@ -33,6 +34,25 @@ func (g *Game) Update() error {
 
 	if g.tick == ^uint(0) {
 		g.tick = 0
+	}
+
+	// Natural block falling
+	if g.tick == 0 {
+		currentTetrimino := g.active
+		currentPosition := currentTetrimino.GetPosition()
+		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
+		if g.playfield.IsColliding(currentTetrimino) {
+			// Revert position
+			currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y)
+
+			// TODO: Switch to delay based hard drop
+			// Drop the tetrimino on the stack
+			g.playfield.UpdateStack(currentTetrimino)
+
+			// Automatically garbage collection yay
+			// TODO: Queue up the next tetrimino
+		}
+
 	}
 
 	// update all objects in the game...?
@@ -61,7 +81,7 @@ func main() {
 		lines:     &lines,
 		state:     playing,
 		playfield: game.NewPlayField(),
-		active:    game.NewTetrimino(game.T),
+		active:    game.NewTetrimino(types.TPiece),
 	}
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)

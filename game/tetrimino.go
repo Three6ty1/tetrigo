@@ -4,76 +4,55 @@ import (
 	_ "image/png"
 	"log"
 
-	"github.com/Three6ty1/tetrigo/helper"
+	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-type Orientation int32
-
-const (
-	O0 Orientation = iota
-	O90
-	O180
-	O270
-)
-
-type Piece int32
-
-const (
-	S Piece = iota
-	Z
-	L
-	J
-	T
-	O
-	I
-)
-
-type Tetrimino struct {
-	piece Piece
-	// Position relative to the playfield array
-	position    *helper.Vector
-	orientation Orientation
-	sprite      *ebiten.Image
+type Tetrimino interface {
+	Draw(screen *ebiten.Image, pf *PlayField, gameScale float64)
+	GetPosition() *types.Vector
+	SetPosition(x float64, y float64)
+	GetMatrix() [][]bool
+	Rotater(types.Orientation) [][]bool
+	RotateLeft()
+	RotateRight()
+	TryRotateLeft() ([][]bool, types.Orientation)
+	TryRotateRight() ([][]bool, types.Orientation)
 }
 
-func NewTetrimino(p Piece) *Tetrimino {
-	t := &Tetrimino{
-		piece:       p,
-		orientation: O0,
-		position:    helper.NewVector(5, 0),
-	}
+type Piece struct {
+	piece types.Piece
+	color types.Mino
+	// Position relative to the playfield array
+	position    *types.Vector
+	orientation types.Orientation
+	sprite      *ebiten.Image
+	matrix      [][]bool
+}
 
-	var newSprite *ebiten.Image
-	var err error
+func NewTetrimino(p types.Piece) Tetrimino {
+	var t Tetrimino
 	switch p {
-	case S:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/S.png")
-	case Z:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/Z.png")
-	case L:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/L.png")
-	case J:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/J.png")
-	case T:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/T.png")
-	case O:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/O.png")
-	case I:
-		newSprite, _, err = ebitenutil.NewImageFromFile("./assets/I.png")
-	}
+	case types.SPiece:
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	case types.ZPiece:
 
-	t.sprite = newSprite
+	case types.LPiece:
+
+	case types.JPiece:
+
+	case types.TPiece:
+
+	case types.OPiece:
+
+	case types.IPiece:
+		t = NewIPiece()
+	}
 
 	return t
 }
 
-func (t Tetrimino) Draw(screen *ebiten.Image, pf *PlayField, gameScale float64) {
+func (t Piece) Draw(screen *ebiten.Image, pf *PlayField, gameScale float64) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(gameScale, gameScale)
 
@@ -86,18 +65,46 @@ func (t Tetrimino) Draw(screen *ebiten.Image, pf *PlayField, gameScale float64) 
 	screen.DrawImage(t.sprite, op)
 }
 
-func (t Tetrimino) RotateLeft(pf PlayField) {
-
+func (t Piece) GetPosition() *types.Vector {
+	return t.position
 }
 
-func (t Tetrimino) RotateRight(pf PlayField) {
-
+func (t Piece) SetPosition(x float64, y float64) {
+	t.position.X = x
+	t.position.Y = y
 }
 
-func (t Tetrimino) GetPosition() {
-
+func (t Piece) GetMatrix() [][]bool {
+	return t.matrix
 }
 
-func (t Tetrimino) SetPosition() {
+func (t Piece) Rotater(o types.Orientation) [][]bool {
+	log.Fatal("Error: Rotator not implemented")
+	return [][]bool{}
+}
 
+func (t Piece) RotateLeft() {
+	t.matrix, t.orientation = t.TryRotateLeft()
+}
+
+func (t Piece) RotateRight() {
+	t.matrix, t.orientation = t.TryRotateRight()
+}
+
+func (t Piece) TryRotateLeft() ([][]bool, types.Orientation) {
+	o := t.orientation - 1
+	if o < 0 {
+		o = types.O270
+	}
+
+	return t.Rotater(o), o
+}
+
+func (t Piece) TryRotateRight() ([][]bool, types.Orientation) {
+	o := t.orientation + 1
+	if o > types.O270 {
+		o = types.O0
+	}
+
+	return t.Rotater(o), o
 }

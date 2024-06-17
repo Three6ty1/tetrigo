@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/Three6ty1/tetrigo/game"
@@ -15,7 +16,7 @@ type Game struct {
 	tick uint
 	// queue
 	// held tetrimino
-	lines     *uint32
+	lines     uint32
 	state     GameState
 	playfield *game.PlayField
 	active    game.Tetrimino
@@ -37,18 +38,25 @@ func (g *Game) Update() error {
 	}
 
 	// Natural block falling
-	if g.tick == 0 {
+	if g.tick%5 == 0 {
 		currentTetrimino := g.active
 		currentPosition := currentTetrimino.GetPosition()
 		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
 		if g.playfield.IsColliding(currentTetrimino) {
+			fmt.Println("Colliding")
 			// Revert position
-			currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y)
+			currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y-1)
 
 			// TODO: Switch to delay based hard drop
 			// Drop the tetrimino on the stack
-			g.playfield.UpdateStack(currentTetrimino)
+			fmt.Println("Updating Stack")
+			err := g.playfield.UpdateStack(currentTetrimino)
+			if err != nil {
+				log.Fatal(err)
+			}
 
+			fmt.Println("Reassigning active?")
+			g.active = game.NewTPiece()
 			// Automatically garbage collection yay
 			// TODO: Queue up the next tetrimino
 		}
@@ -75,13 +83,12 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	ebiten.SetWindowSize(1600, 900)
 	ebiten.SetWindowTitle("Tetrigo")
-	var lines uint32 = 0
 
 	g := &Game{
-		lines:     &lines,
+		lines:     0,
 		state:     playing,
 		playfield: game.NewPlayField(),
-		active:    game.NewTetrimino(types.TPiece),
+		active:    game.NewTetrimino(types.IPiece),
 	}
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)

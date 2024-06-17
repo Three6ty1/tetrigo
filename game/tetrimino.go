@@ -11,7 +11,11 @@ import (
 const T = true
 const F = false
 
+const StartingX = 5
+const StartingY = 0
+
 type Tetrimino interface {
+	GetColor() types.Mino
 	Draw(screen *ebiten.Image, pf *PlayField, gameScale float64)
 	GetPosition() *types.Vector
 	SetPosition(x float64, y float64)
@@ -55,13 +59,17 @@ func NewTetrimino(p types.Piece) Tetrimino {
 	return t
 }
 
+func (t Piece) GetColor() types.Mino {
+	return t.color
+}
+
 func (t Piece) Draw(screen *ebiten.Image, pf *PlayField, gameScale float64) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(gameScale, gameScale)
 
 	// +1 due to border
 	x := pf.playfieldStart.X + (float64(pf.minoOffset) * (t.position.X))
-	y := pf.playfieldStart.Y + (float64(pf.minoOffset) * (t.position.Y + 1.0))
+	y := pf.playfieldStart.Y + (float64(pf.minoOffset) * (t.position.Y))
 
 	op.GeoM.Translate(x, y)
 

@@ -21,7 +21,7 @@ func NewLPiece() *LPiece {
 			piece:       types.LPiece,
 			color:       types.Mino(types.LPiece),
 			orientation: types.O0,
-			position:    types.NewVector(5, 0),
+			position:    types.NewVector(StartingX, StartingY),
 			sprite:      s,
 			matrix: [][]bool{
 				{F, F, T},

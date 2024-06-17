@@ -21,7 +21,7 @@ func NewZPiece() *ZPiece {
 			piece:       types.ZPiece,
 			color:       types.Mino(types.ZPiece),
 			orientation: types.O0,
-			position:    types.NewVector(5, 0),
+			position:    types.NewVector(StartingX, StartingY),
 			sprite:      s,
 			matrix: [][]bool{
 				{T, T, F},

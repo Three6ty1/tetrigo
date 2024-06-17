@@ -21,7 +21,7 @@ func NewJPiece() *JPiece {
 			piece:       types.JPiece,
 			color:       types.Mino(types.JPiece),
 			orientation: types.O0,
-			position:    types.NewVector(5, 0),
+			position:    types.NewVector(StartingX, StartingY),
 			sprite:      s,
 			matrix: [][]bool{
 				{T, F, F},

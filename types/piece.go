@@ -1,28 +1,30 @@
 package types
 
-type Mino int32
-
-// These two are equivalents
-const (
-	green Mino = iota
-	red
-	blue
-	orange
-	purple
-	yellow
-	lightBlue
-)
-
 type Piece int32
 
 const (
-	SPiece Piece = iota
+	Empty Piece = iota
+	SPiece
 	ZPiece
 	LPiece
 	JPiece
 	TPiece
 	OPiece
 	IPiece
+)
+
+type Mino int32
+
+// These two are equivalents
+const (
+	None Mino = iota
+	Green
+	Red
+	Blue
+	Orange
+	Purple
+	Yellow
+	LightBlue
 )
 
 type Orientation int32

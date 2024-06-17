@@ -43,6 +43,7 @@ func (g *Game) Update() error {
 		currentPosition := currentTetrimino.GetPosition()
 		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
 		if g.playfield.IsColliding(currentTetrimino) {
+			fmt.Printf("Tick: %v\n", g.tick)
 			fmt.Println("Colliding")
 			// Revert position
 			currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y-1)
@@ -55,7 +56,6 @@ func (g *Game) Update() error {
 				log.Fatal(err)
 			}
 
-			fmt.Println("Reassigning active?")
 			g.active = game.NewTPiece()
 			// Automatically garbage collection yay
 			// TODO: Queue up the next tetrimino

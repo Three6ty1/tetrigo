@@ -12,7 +12,7 @@ type ZPiece struct {
 }
 
 func NewZPiece() *ZPiece {
-	s, _, err := ebitenutil.NewImageFromFile("./assets/Z.png")
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "Z.png")
 	if err != nil {
 		log.Fatal(err)
 	}

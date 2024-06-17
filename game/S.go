@@ -12,7 +12,7 @@ type SPiece struct {
 }
 
 func NewSPiece() *SPiece {
-	s, _, err := ebitenutil.NewImageFromFile("./assets/S.png")
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "S.png")
 	if err != nil {
 		log.Fatal(err)
 	}

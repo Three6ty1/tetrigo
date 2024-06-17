@@ -12,7 +12,7 @@ type JPiece struct {
 }
 
 func NewJPiece() *JPiece {
-	s, _, err := ebitenutil.NewImageFromFile("./assets/J.png")
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "J.png")
 	if err != nil {
 		log.Fatal(err)
 	}

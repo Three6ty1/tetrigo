@@ -12,7 +12,7 @@ type OPiece struct {
 }
 
 func NewOPiece() *OPiece {
-	s, _, err := ebitenutil.NewImageFromFile("./assets/I.png")
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "I.png")
 	if err != nil {
 		log.Fatal(err)
 	}

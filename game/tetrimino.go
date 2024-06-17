@@ -13,6 +13,7 @@ const F = false
 
 const StartingX = 5
 const StartingY = 0
+const TetriminoPath = "./assets/tetriminos/"
 
 type Tetrimino interface {
 	GetColor() types.Mino

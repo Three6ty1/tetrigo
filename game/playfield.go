@@ -9,6 +9,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
+const minoPath = "./assets/minos/"
+
 var boardImg *ebiten.Image
 var minoGreen *ebiten.Image
 var minoRed *ebiten.Image
@@ -180,43 +182,43 @@ func initImages() {
 	}
 	boardImg = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/Green.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "Green.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	minoGreen = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/Red.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "Red.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	minoRed = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/Blue.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "Blue.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	minoBlue = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/Orange.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "Orange.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	minoOrange = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/Purple.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "Purple.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	minoPurple = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/Yellow.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "Yellow.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	minoYellow = currImg
 
-	currImg, _, err = ebitenutil.NewImageFromFile("./assets/LightBlue.png")
+	currImg, _, err = ebitenutil.NewImageFromFile(minoPath + "LightBlue.png")
 	if err != nil {
 		log.Fatal(err)
 	}

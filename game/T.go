@@ -12,7 +12,7 @@ type TPiece struct {
 }
 
 func NewTPiece() *TPiece {
-	s, _, err := ebitenutil.NewImageFromFile("./assets/T.png")
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "T.png")
 	if err != nil {
 		log.Fatal(err)
 	}

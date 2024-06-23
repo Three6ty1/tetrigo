@@ -56,9 +56,9 @@ func (g *Game) Update() error {
 				log.Fatal(err)
 			}
 
+			// Queue up the next tetrimino
 			g.active = g.queue.Next()
-			// Automatically garbage collection yay
-			// TODO: Queue up the next tetrimino
+
 		}
 
 	}
@@ -106,8 +106,11 @@ func main() {
 		state:     playing,
 		playfield: game.NewPlayField(),
 		queue:     game.NewTetriminoQueue(),
-		active:    game.NewTetrimino(types.IPiece),
+		active:    nil,
 	}
+
+	g.active = g.queue.Next()
+
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}

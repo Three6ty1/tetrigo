@@ -8,6 +8,7 @@ import (
 	"github.com/Three6ty1/tetrigo/types"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 var GameScale = 0.5
@@ -37,37 +38,77 @@ func (g *Game) Update() error {
 		g.tick = 0
 	}
 
+	controls(g, g.tick)
+
 	// Natural block falling
-	if g.tick%5 == 0 {
-		currentTetrimino := g.active
-		currentPosition := currentTetrimino.GetPosition()
-		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
-		if g.playfield.IsColliding(currentTetrimino) {
-			fmt.Printf("Tick: %v\n", g.tick)
-			fmt.Println("Colliding")
-			// Revert position
-			currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y-1)
+	if g.tick%15 == 0 {
+		handleDrop(g)
+	}
 
-			// TODO: Switch to delay based hard drop
-			// Drop the tetrimino on the stack
-			fmt.Println("Updating Stack")
-			err := g.playfield.UpdateStack(currentTetrimino)
-			if err != nil {
-				log.Fatal(err)
-			}
+	return nil
+}
 
-			// Queue up the next tetrimino
-			g.active = g.queue.Next()
+func handleDrop(g *Game) {
+	currentTetrimino := g.active
+	currentPosition := currentTetrimino.GetPosition()
+	currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
+	if g.playfield.IsColliding(currentTetrimino) {
+		fmt.Printf("Tick: %v\n", g.tick)
+		fmt.Println("Colliding")
+		// Revert position
+		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y-1)
 
+		// TODO: Switch to delay based hard drop
+		// Drop the tetrimino on the stack
+		fmt.Println("Updating Stack")
+		err := g.playfield.UpdateStack(currentTetrimino)
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		// Queue up the next tetrimino
+		g.active = g.queue.Next()
+
+	}
+}
+
+func controls(g *Game, tick uint) {
+	currentTetrimino := g.active
+	currentPosition := currentTetrimino.GetPosition()
+
+	// TODO: Change to hotkeys
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%3 == 0 {
+		currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
+		if g.playfield.IsColliding(currentTetrimino) {
+			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%3 == 0 {
+		currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
+		if g.playfield.IsColliding(currentTetrimino) {
+			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && tick%2 == 0 {
+		handleDrop(g)
+
+	} else if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		current := g.active
+		for current == g.active {
+			handleDrop(g)
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
+
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
 
 	}
 
-	// update all objects in the game...?
-	// Increment the current falling block
-	// Generate the next block in the queue
+	// else if inpututil.IsKeyJustPressed(ebiten.KeyShift) {
 
-	return nil
+	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+
+	// }
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

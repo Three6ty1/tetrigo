@@ -51,12 +51,10 @@ func (g *Game) Update() error {
 func handleDrop(g *Game) {
 	currentTetrimino := g.active
 	currentPosition := currentTetrimino.GetPosition()
-	currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
-	if g.playfield.IsColliding(currentTetrimino) {
+
+	if game.IsColliding(*g.playfield, currentPosition.X, currentPosition.Y+1, currentTetrimino.GetMatrix()) {
 		fmt.Printf("Tick: %v\n", g.tick)
 		fmt.Println("Colliding")
-		// Revert position
-		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y-1)
 
 		// TODO: Switch to delay based hard drop
 		// Drop the tetrimino on the stack
@@ -69,24 +67,24 @@ func handleDrop(g *Game) {
 		// Queue up the next tetrimino
 		g.active = g.queue.Next()
 
+	} else {
+		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
 	}
 }
 
 func controls(g *Game, tick uint) {
 	currentTetrimino := g.active
 	currentPosition := currentTetrimino.GetPosition()
-
+	currentMatrix := currentTetrimino.GetMatrix()
 	// TODO: Change to hotkeys
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%3 == 0 {
-		currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
-		if g.playfield.IsColliding(currentTetrimino) {
-			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
+		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
+			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%3 == 0 {
-		currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
-		if g.playfield.IsColliding(currentTetrimino) {
-			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
+		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
+			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && tick%2 == 0 {
@@ -99,6 +97,7 @@ func controls(g *Game, tick uint) {
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
+		// rotatedMatrix, _ := currentTetrimino.TryRotateLeft()
 
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
 

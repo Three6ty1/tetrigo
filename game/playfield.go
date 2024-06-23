@@ -111,19 +111,20 @@ func (pf PlayField) IsColliding(t Tetrimino) bool {
 	// Check every position occupied in a collision box and see if it is touching the bottom, sides or another mino
 	for row := 0; row < len(collisionBox); row++ {
 		realRow := int(startPos.Y) + row - 1
+		fmt.Println(realRow)
 
 		for col := 0; col < len(collisionBox[0]); col++ {
 			realCol := int(startPos.X) + col - 1
 
 			// If the piece isnt colliding in this position
-			if !collisionBox[row][col] {
+			if !collisionBox[row][col] || realRow == -1 {
 				continue
 			}
 
 			// The piece is colliding
 			// 1. Extending past stack borders
 			// 2. Within borders and colliding with a placed mino
-			if realRow >= len(pf.stack) || realCol >= len(pf.stack[0]) || (pf.stack[realRow][realCol] != types.None && collisionBox[row][col]) {
+			if realRow >= len(pf.stack) || realCol >= len(pf.stack[0]) || realCol < 0 || (pf.stack[realRow][realCol] != types.None && collisionBox[row][col]) {
 				return true
 			}
 		}
@@ -166,10 +167,6 @@ func (pf *PlayField) UpdateStack(t Tetrimino) error {
 
 func (pf *PlayField) ClearLines() {
 
-}
-
-func (pf PlayField) CheckOutOfBounds() bool {
-	return false
 }
 
 func initImages() {

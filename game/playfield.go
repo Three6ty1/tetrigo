@@ -131,7 +131,7 @@ func (pf PlayField) IsColliding(t Tetrimino) bool {
 	return false
 }
 
-func (pf PlayField) UpdateStack(t Tetrimino) error {
+func (pf *PlayField) UpdateStack(t Tetrimino) error {
 	startPos := t.GetPosition()
 	collisionBox := t.GetMatrix()
 	color := t.GetColor()
@@ -164,7 +164,7 @@ func (pf PlayField) UpdateStack(t Tetrimino) error {
 	return nil
 }
 
-func (pf PlayField) ClearLines() {
+func (pf *PlayField) ClearLines() {
 
 }
 
@@ -223,4 +223,12 @@ func initImages() {
 		log.Fatal(err)
 	}
 	minoLightBlue = currImg
+}
+
+func (pf PlayField) GetPlayFieldStart() types.Vector {
+	return pf.playfieldStart
+}
+
+func (pf PlayField) GetMinoOffset() float64 {
+	return pf.minoOffset
 }

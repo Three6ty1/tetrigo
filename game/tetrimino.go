@@ -17,7 +17,6 @@ const TetriminoPath = "./assets/tetriminos/"
 
 type Tetrimino interface {
 	GetColor() types.Mino
-	Draw(screen *ebiten.Image, pf *PlayField, gameScale float64)
 	GetPosition() *types.Vector
 	SetPosition(x float64, y float64)
 	GetMatrix() [][]bool
@@ -26,6 +25,7 @@ type Tetrimino interface {
 	RotateRight()
 	TryRotateLeft() ([][]bool, types.Orientation)
 	TryRotateRight() ([][]bool, types.Orientation)
+	GetSprite() *ebiten.Image
 }
 
 type Piece struct {
@@ -64,24 +64,11 @@ func (t Piece) GetColor() types.Mino {
 	return t.color
 }
 
-func (t Piece) Draw(screen *ebiten.Image, pf *PlayField, gameScale float64) {
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(gameScale, gameScale)
-
-	// +1 due to border
-	x := pf.playfieldStart.X + (float64(pf.minoOffset) * (t.position.X))
-	y := pf.playfieldStart.Y + (float64(pf.minoOffset) * (t.position.Y))
-
-	op.GeoM.Translate(x, y)
-
-	screen.DrawImage(t.sprite, op)
-}
-
 func (t Piece) GetPosition() *types.Vector {
 	return t.position
 }
 
-func (t Piece) SetPosition(x float64, y float64) {
+func (t *Piece) SetPosition(x float64, y float64) {
 	t.position.X = x
 	t.position.Y = y
 }
@@ -95,11 +82,11 @@ func (t Piece) Rotater(o types.Orientation) [][]bool {
 	return [][]bool{}
 }
 
-func (t Piece) RotateLeft() {
+func (t *Piece) RotateLeft() {
 	t.matrix, t.orientation = t.TryRotateLeft()
 }
 
-func (t Piece) RotateRight() {
+func (t *Piece) RotateRight() {
 	t.matrix, t.orientation = t.TryRotateRight()
 }
 
@@ -119,4 +106,8 @@ func (t Piece) TryRotateRight() ([][]bool, types.Orientation) {
 	}
 
 	return t.Rotater(o), o
+}
+
+func (t Piece) GetSprite() *ebiten.Image {
+	return t.sprite
 }

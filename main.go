@@ -13,8 +13,8 @@ import (
 var GameScale = 0.5
 
 type Game struct {
-	tick uint
-	// queue
+	tick  uint
+	queue *game.TetriminoQueue
 	// held tetrimino
 	lines     uint32
 	state     GameState
@@ -56,7 +56,7 @@ func (g *Game) Update() error {
 				log.Fatal(err)
 			}
 
-			g.active = game.NewTPiece()
+			g.active = g.queue.Next()
 			// Automatically garbage collection yay
 			// TODO: Queue up the next tetrimino
 		}
@@ -71,8 +71,25 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	pfStart := g.playfield.GetPlayFieldStart()
+	minoOffset := g.playfield.GetMinoOffset()
+
 	g.playfield.Draw(screen, GameScale)
-	g.active.Draw(screen, g.playfield, GameScale)
+	g.DrawActive(screen, pfStart, minoOffset)
+	g.queue.Draw(screen, pfStart, minoOffset, GameScale)
+}
+
+func (g *Game) DrawActive(screen *ebiten.Image, pfStart types.Vector, minoOffset float64) {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(GameScale, GameScale)
+
+	tPosition := g.active.GetPosition()
+	x := pfStart.X + (float64(minoOffset) * tPosition.X)
+	y := pfStart.Y + (float64(minoOffset) * tPosition.Y)
+
+	op.GeoM.Translate(x, y)
+
+	screen.DrawImage(g.active.GetSprite(), op)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -88,6 +105,7 @@ func main() {
 		lines:     0,
 		state:     playing,
 		playfield: game.NewPlayField(),
+		queue:     game.NewTetriminoQueue(),
 		active:    game.NewTetrimino(types.IPiece),
 	}
 	if err := ebiten.RunGame(g); err != nil {

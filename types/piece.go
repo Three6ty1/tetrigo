@@ -20,8 +20,8 @@ const (
 	None Mino = iota
 	Green
 	Red
-	Blue
 	Orange
+	Blue
 	Purple
 	Yellow
 	LightBlue

@@ -12,7 +12,7 @@ type OPiece struct {
 }
 
 func NewOPiece() *OPiece {
-	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "I.png")
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "O.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -24,9 +24,8 @@ func NewOPiece() *OPiece {
 			position:    types.NewVector(StartingX, StartingY),
 			sprite:      s,
 			matrix: [][]bool{
-				{F, T, T, F},
-				{F, T, T, F},
-				{F, F, F, F},
+				{T, T},
+				{T, T},
 			},
 		},
 	}
@@ -35,8 +34,7 @@ func NewOPiece() *OPiece {
 // No Rotation
 func (t OPiece) Rotater(o types.Orientation) [][]bool {
 	return [][]bool{
-		{F, T, T, F},
-		{F, T, T, F},
-		{F, F, F, F},
+		{T, T},
+		{T, T},
 	}
 }

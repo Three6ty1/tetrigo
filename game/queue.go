@@ -1,11 +1,13 @@
 package game
 
 import (
+	"image/color"
 	"math/rand"
 	"time"
 
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -15,18 +17,29 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 // Queue is 6 long, but only displays 5
 type TetriminoQueue struct {
 	queue []Tetrimino
+	next  []Tetrimino
+}
+
+func newQueue() *[]Tetrimino {
+	// https://tetris.fandom.com/wiki/Random_Generator
+	// 7-piece bag
+	q := make([]Tetrimino, 0)
+
+	for i := 1; i <= 7; i++ {
+		q = append(q, NewTetrimino(types.Piece(i)))
+	}
+
+	r.Shuffle(len(q), func(i, j int) {
+		q[i], q[j] = q[j], q[i]
+	})
+
+	return &q
 }
 
 func NewTetriminoQueue() *TetriminoQueue {
-	q := make([]Tetrimino, 0)
-
-	// [0 - 7)
-	for len(q) < 6 {
-		q = append(q, NewTetrimino(types.Piece(r.Int31n(6)+1)))
-	}
-
 	tq := &TetriminoQueue{
-		queue: q,
+		queue: *newQueue(),
+		next:  *newQueue(),
 	}
 
 	return tq
@@ -35,13 +48,22 @@ func NewTetriminoQueue() *TetriminoQueue {
 func (tq *TetriminoQueue) Next() Tetrimino {
 	// https://stackoverflow.com/a/26863706
 	next := tq.queue[0]
-	tq.queue = append(tq.queue, NewTetrimino(types.Piece(r.Int31n(6)+1)))
 	tq.queue = tq.queue[1:]
+
+	if len(tq.queue) == 0 {
+		tq.queue = tq.next
+		tq.next = *newQueue()
+	}
 
 	return next
 }
 
 func (tq TetriminoQueue) Draw(screen *ebiten.Image, pfStart types.Vector, minoOffset float64, gameScale float64) {
+	var q []Tetrimino
+
+	q = append(q, tq.queue...)
+	q = append(q, tq.next[:7-len(tq.queue)]...)
+
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(gameScale*0.75, gameScale*0.75)
 
@@ -53,11 +75,17 @@ func (tq TetriminoQueue) Draw(screen *ebiten.Image, pfStart types.Vector, minoOf
 
 	var y float64
 
-	for i := 0; i < len(tq.queue); i++ {
+	for i := 0; i < len(q); i++ {
+
 		y = qStartY + (minoOffset*4)*float64(i)
 
+		// TODO: Remove. Here for stack debugging
+		if i > len(tq.queue) {
+			vector.DrawFilledRect(screen, float32(qStartX), float32(y)+20, 50.0, 2.0, color.RGBA{255, 0, 0, 255}, false)
+		}
+
 		op.GeoM.Translate(0, y)
-		screen.DrawImage(tq.queue[i].GetSprite(), op)
+		screen.DrawImage(q[i].GetSprite(), op)
 		op.GeoM.Translate(0, -y)
 	}
 

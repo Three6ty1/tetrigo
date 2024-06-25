@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/Three6ty1/tetrigo/game"
 	"github.com/Three6ty1/tetrigo/types"
@@ -141,6 +142,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) DrawActive(screen *ebiten.Image, pfStart types.Vector, minoOffset float64) {
 	op := &ebiten.DrawImageOptions{}
+	s := g.active.GetSprite().Bounds().Size()
+
+	op.GeoM.Translate(-float64(s.X)/2, -float64(s.Y)/2)
+	op.GeoM.Rotate((90 * float64(g.active.GetOrientation())) * (math.Pi / 180))
+	op.GeoM.Translate(float64(s.X)/2, float64(s.Y)/2)
 	op.GeoM.Scale(GameScale, GameScale)
 
 	tPosition := g.active.GetPosition()

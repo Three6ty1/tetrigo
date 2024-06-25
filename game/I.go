@@ -24,10 +24,11 @@ func NewIPiece() *IPiece {
 			position:    types.NewVector(StartingX, StartingY),
 			sprite:      s,
 			matrix: [][]bool{
-				{F, F, F, F},
-				{T, T, T, T},
-				{F, F, F, F},
-				{F, F, F, F},
+				{F, F, F, F, F},
+				{F, F, F, F, F},
+				{F, T, T, T, T},
+				{F, F, F, F, F},
+				{F, F, F, F, F},
 			},
 		},
 	}
@@ -48,31 +49,35 @@ func (t IPiece) Rotater(o types.Orientation) [][]bool {
 	switch o {
 	case types.O0:
 		return [][]bool{
-			{F, F, F, F},
-			{T, T, T, T},
-			{F, F, F, F},
-			{F, F, F, F},
+			{F, F, F, F, F},
+			{F, F, F, F, F},
+			{F, T, T, T, T},
+			{F, F, F, F, F},
+			{F, F, F, F, F},
 		}
 	case types.O90:
 		return [][]bool{
-			{F, F, T, F},
-			{F, F, T, F},
-			{F, F, T, F},
-			{F, F, T, F},
+			{F, F, F, F, F},
+			{F, F, T, F, F},
+			{F, F, T, F, F},
+			{F, F, T, F, F},
+			{F, F, T, F, F},
 		}
 	case types.O180:
 		return [][]bool{
-			{F, F, F, F},
-			{F, F, F, F},
-			{T, T, T, T},
-			{F, F, F, F},
+			{F, F, F, F, F},
+			{F, F, F, F, F},
+			{T, T, T, T, F},
+			{F, F, F, F, F},
+			{F, F, F, F, F},
 		}
 	default:
 		return [][]bool{
-			{F, T, F, F},
-			{F, T, F, F},
-			{F, T, F, F},
-			{F, T, F, F},
+			{F, F, T, F, F},
+			{F, F, T, F, F},
+			{F, F, T, F, F},
+			{F, F, T, F, F},
+			{F, F, F, F, F},
 		}
 	}
 }

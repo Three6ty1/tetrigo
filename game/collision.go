@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/Three6ty1/tetrigo/types"
 )
 
@@ -85,9 +87,12 @@ func RotateKicker(pf PlayField, t Tetrimino, isLeft bool) (types.Vector, bool) {
 
 	offsetData := getOffsetData(types.Piece(t.GetColor()), from, to)
 
+	fmt.Printf("NEW TURN\n")
+	fmt.Printf("%v\n", offsetData)
+
 	for i := 0; i < 5; i++ {
-		x = startPos.X - float64(offsetData[i][0])
-		y = startPos.Y - float64(offsetData[i][1])
+		x = startPos.X + float64(offsetData[i][0])
+		y = startPos.Y + float64(offsetData[i][1])
 
 		if !IsColliding(pf, x, y, collisionBox) {
 			return *types.NewVector(x, y), true

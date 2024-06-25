@@ -32,26 +32,38 @@ func NewZPiece() *ZPiece {
 	}
 }
 
+func (t *ZPiece) Rotate(isLeft bool) {
+	if isLeft {
+		t.orientation = t.TryRotateLeft(t.orientation)
+		t.matrix = t.Rotater(t.orientation)
+	} else {
+		t.orientation = t.TryRotateRight(t.orientation)
+		t.matrix = t.Rotater(t.orientation)
+	}
+
+}
+
 func (t ZPiece) Rotater(o types.Orientation) [][]bool {
-	if o == types.O0 {
+	switch o {
+	case types.O0:
 		return [][]bool{
 			{T, T, F},
 			{F, T, T},
 			{F, F, F},
 		}
-	} else if o == types.O90 {
+	case types.O90:
 		return [][]bool{
 			{F, F, T},
 			{F, T, T},
 			{F, T, F},
 		}
-	} else if o == types.O180 {
+	case types.O180:
 		return [][]bool{
 			{F, F, F},
 			{T, T, F},
 			{F, T, T},
 		}
-	} else {
+	default:
 		return [][]bool{
 			{F, T, F},
 			{T, T, F},

@@ -33,29 +33,41 @@ func NewIPiece() *IPiece {
 	}
 }
 
-func (t IPiece) Rotater(o types.Orientation) [][]bool {
-	if o == types.O0 {
-		return [][]bool{
-			{F, F, F, F},
-			{T, T, T, T},
-			{F, F, F, F},
-			{F, F, F, F},
-		}
-	} else if o == types.O90 {
-		return [][]bool{
-			{F, F, T, F},
-			{F, F, T, F},
-			{F, F, T, F},
-			{F, F, T, F},
-		}
-	} else if o == types.O180 {
-		return [][]bool{
-			{F, F, F, F},
-			{F, F, F, F},
-			{T, T, T, T},
-			{F, F, F, F},
-		}
+func (t *IPiece) Rotate(isLeft bool) {
+	if isLeft {
+		t.orientation = t.TryRotateLeft(t.orientation)
+		t.matrix = t.Rotater(t.orientation)
 	} else {
+		t.orientation = t.TryRotateRight(t.orientation)
+		t.matrix = t.Rotater(t.orientation)
+	}
+
+}
+
+func (t IPiece) Rotater(o types.Orientation) [][]bool {
+	switch o {
+	case types.O0:
+		return [][]bool{
+			{F, F, F, F},
+			{T, T, T, T},
+			{F, F, F, F},
+			{F, F, F, F},
+		}
+	case types.O90:
+		return [][]bool{
+			{F, F, T, F},
+			{F, F, T, F},
+			{F, F, T, F},
+			{F, F, T, F},
+		}
+	case types.O180:
+		return [][]bool{
+			{F, F, F, F},
+			{F, F, F, F},
+			{T, T, T, T},
+			{F, F, F, F},
+		}
+	default:
 		return [][]bool{
 			{F, T, F, F},
 			{F, T, F, F},

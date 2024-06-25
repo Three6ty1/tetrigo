@@ -2,7 +2,6 @@ package game
 
 import (
 	_ "image/png"
-	"log"
 
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -20,12 +19,12 @@ type Tetrimino interface {
 	GetPosition() *types.Vector
 	SetPosition(x float64, y float64)
 	GetMatrix() [][]bool
-	Rotater(types.Orientation) [][]bool
-	RotateLeft()
-	RotateRight()
-	TryRotateLeft() ([][]bool, types.Orientation)
-	TryRotateRight() ([][]bool, types.Orientation)
+	Rotate(isLeft bool)
+	Rotater(o types.Orientation) [][]bool
+	TryRotateLeft(o types.Orientation) types.Orientation
+	TryRotateRight(o types.Orientation) types.Orientation
 	GetSprite() *ebiten.Image
+	GetOrientation() types.Orientation
 }
 
 type Piece struct {
@@ -60,6 +59,10 @@ func NewTetrimino(p types.Piece) Tetrimino {
 	return t
 }
 
+func (t Piece) GetOrientation() types.Orientation {
+	return t.orientation
+}
+
 func (t Piece) GetColor() types.Mino {
 	return t.color
 }
@@ -77,37 +80,24 @@ func (t Piece) GetMatrix() [][]bool {
 	return t.matrix
 }
 
-func (t Piece) Rotater(o types.Orientation) [][]bool {
-	log.Fatal("Error: Rotator not implemented")
-	return [][]bool{}
-}
-
-func (t *Piece) RotateLeft() {
-	t.matrix, t.orientation = t.TryRotateLeft()
-}
-
-func (t *Piece) RotateRight() {
-	t.matrix, t.orientation = t.TryRotateRight()
-}
-
-func (t Piece) TryRotateLeft() ([][]bool, types.Orientation) {
-	o := t.orientation - 1
-	if o < 0 {
-		o = types.O270
-	}
-
-	return t.Rotater(o), o
-}
-
-func (t Piece) TryRotateRight() ([][]bool, types.Orientation) {
-	o := t.orientation + 1
-	if o > types.O270 {
-		o = types.O0
-	}
-
-	return t.Rotater(o), o
-}
-
 func (t Piece) GetSprite() *ebiten.Image {
 	return t.sprite
+}
+
+func (t Piece) TryRotateLeft(o types.Orientation) types.Orientation {
+	new := t.orientation - 1
+	if new < 0 {
+		new = types.O270
+	}
+
+	return new
+}
+
+func (t Piece) TryRotateRight(o types.Orientation) types.Orientation {
+	new := t.orientation + 1
+	if new > types.O270 {
+		new = types.O0
+	}
+
+	return new
 }

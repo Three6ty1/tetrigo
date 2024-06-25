@@ -14,9 +14,9 @@ import (
 var GameScale = 0.25
 
 type Game struct {
-	tick  uint
-	queue *game.TetriminoQueue
-	// held tetrimino
+	tick      uint
+	queue     *game.TetriminoQueue
+	hold      *game.Hold
 	lines     uint32
 	state     GameState
 	playfield *game.PlayField
@@ -66,6 +66,7 @@ func handleDrop(g *Game) {
 
 		// Queue up the next tetrimino
 		g.active = g.queue.Next()
+		g.hold.ResetCanHold()
 
 	} else {
 		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
@@ -90,7 +91,8 @@ func controls(g *Game, tick uint) {
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && tick%2 == 0 {
 		handleDrop(g)
 
-	} else if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		current := g.active
 		for current == g.active {
 			handleDrop(g)
@@ -99,12 +101,21 @@ func controls(g *Game, tick uint) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
 		// rotatedMatrix, _ := currentTetrimino.TryRotateLeft()
 
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
 
 	}
 
-	// else if inpututil.IsKeyJustPressed(ebiten.KeyShift) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyShift) {
+		if g.hold.CanHold() {
+			g.active = g.hold.Swap(g.active)
 
+			// First swap
+			if g.active == nil {
+				g.active = g.queue.Next()
+			}
+		}
+	}
 	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 
 	// }
@@ -117,6 +128,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.playfield.Draw(screen, GameScale)
 	g.DrawActive(screen, pfStart, minoOffset)
 	g.queue.Draw(screen, pfStart, minoOffset, GameScale)
+	g.hold.Draw(screen, pfStart, minoOffset, GameScale)
 }
 
 func (g *Game) DrawActive(screen *ebiten.Image, pfStart types.Vector, minoOffset float64) {
@@ -146,6 +158,7 @@ func main() {
 		state:     playing,
 		playfield: game.NewPlayField(),
 		queue:     game.NewTetriminoQueue(),
+		hold:      game.NewHold(),
 		active:    nil,
 	}
 

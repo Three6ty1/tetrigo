@@ -65,7 +65,7 @@ func handleDrop(g *Game) {
 			log.Fatal(err)
 		}
 
-		// Queue up the next tetrimino
+		g.playfield.ClearLines()
 		g.active = g.queue.Next()
 		g.hold.ResetCanHold()
 
@@ -79,12 +79,12 @@ func controls(g *Game, tick uint) {
 	currentPosition := currentTetrimino.GetPosition()
 	currentMatrix := currentTetrimino.GetMatrix()
 	// TODO: Change to hotkeys
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%3 == 0 {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%4 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
 		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%3 == 0 {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%4 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
 		}
@@ -115,7 +115,7 @@ func controls(g *Game, tick uint) {
 		}
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyShift) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyShift) || inpututil.IsKeyJustPressed(ebiten.KeyC) {
 		if g.hold.CanHold() {
 			g.active = g.hold.Swap(g.active)
 

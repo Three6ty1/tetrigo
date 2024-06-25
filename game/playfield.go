@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"log"
+	"slices"
 
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -138,7 +139,25 @@ func (pf *PlayField) UpdateStack(t Tetrimino) error {
 }
 
 func (pf *PlayField) ClearLines() {
+	// Check each row to see if there is an empty space
+	s := make([][]types.Mino, 22)
 
+	curr := 21
+
+	for i := 21; i >= 0; i-- {
+		if slices.Contains(pf.stack[i], types.None) {
+			s[curr] = pf.stack[i]
+			curr--
+		}
+	}
+
+	fmt.Printf("Cleared %v lines\n", curr+1)
+
+	for i := curr; i >= 0; i-- {
+		s[i] = make([]types.Mino, 10)
+	}
+
+	pf.stack = s
 }
 
 func initImages() {

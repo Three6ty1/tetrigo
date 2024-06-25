@@ -69,19 +69,19 @@ func (tq TetriminoQueue) Draw(screen *ebiten.Image, pfStart types.Vector, minoOf
 
 	// Move to top right corner of the playfield and then some more
 	qStartX := pfStart.X + (minoOffset * 13)
-	qStartY := pfStart.Y
+	qStartY := pfStart.Y + (minoOffset)
 
 	op.GeoM.Translate(qStartX, qStartY)
 
 	var y float64
 
-	for i := 0; i < len(q); i++ {
+	for i := 0; i < 5; i++ {
 
-		y = qStartY + (minoOffset*4)*float64(i)
+		y = qStartY + (minoOffset*3)*float64(i)
 
 		// TODO: Remove. Here for stack debugging
 		if i > len(tq.queue) {
-			vector.DrawFilledRect(screen, float32(qStartX), float32(y)+20, 50.0, 2.0, color.RGBA{255, 0, 0, 255}, false)
+			vector.DrawFilledRect(screen, float32(qStartX), float32(y), 50.0, 2.0, color.RGBA{255, 0, 0, 255}, false)
 		}
 
 		op.GeoM.Translate(0, y)

@@ -27,7 +27,7 @@ type PlayField struct {
 }
 
 func NewPlayField() *PlayField {
-	s := make([][]types.Mino, 20)
+	s := make([][]types.Mino, 22)
 
 	for i := range s {
 		s[i] = make([]types.Mino, 10)
@@ -59,7 +59,7 @@ func (pf *PlayField) Draw(screen *ebiten.Image, gameScale float64) {
 	// Have to set this because we don't know until runtime what the offset is for the window
 	if pf.minoOffset == 0.0 {
 		pf.minoOffset = bw * gameScale / 12
-		pf.playfieldStart = *types.NewVector(startX, startY)
+		pf.playfieldStart = *types.NewVector(startX, startY-pf.minoOffset*2)
 	}
 
 	screen.DrawImage(boardImg, op)

@@ -99,11 +99,19 @@ func controls(g *Game, tick uint) {
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-		// rotatedMatrix, _ := currentTetrimino.TryRotateLeft()
+		newPos, valid := game.RotateKicker(*g.playfield, g.active, true)
+		if valid {
+			g.active.SetPosition(newPos.X, newPos.Y)
+			g.active.Rotate(true)
+		}
 
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
-
+	if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		newPos, valid := game.RotateKicker(*g.playfield, g.active, false)
+		if valid {
+			g.active.SetPosition(newPos.X, newPos.Y)
+			g.active.Rotate(false)
+		}
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyShift) {

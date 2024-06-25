@@ -153,9 +153,28 @@ func (g *Game) DrawActive(screen *ebiten.Image, pfStart types.Vector, minoOffset
 	x := pfStart.X + (float64(minoOffset) * tPosition.X)
 	y := pfStart.Y + (float64(minoOffset) * tPosition.Y)
 
+	// Deep copy the op
+	g.drawGhost(screen, x, y, op)
+
 	op.GeoM.Translate(x, y)
 
 	screen.DrawImage(g.active.GetSprite(), op)
+}
+
+func (g *Game) drawGhost(screen *ebiten.Image, x float64, y float64, op *ebiten.DrawImageOptions) {
+	collisionBox := g.active.GetMatrix()
+	for !game.IsColliding(*g.playfield, x, y+1, collisionBox) {
+		y++
+		fmt.Printf("%v\n", y)
+	}
+
+	op.GeoM.Translate(x, y)
+	op.ColorScale.ScaleAlpha(0.5)
+
+	screen.DrawImage(g.active.GetSprite(), op)
+
+	op.GeoM.Translate(-x, -y)
+	op.ColorScale.ScaleAlpha(1)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

@@ -47,10 +47,10 @@ func getOffsetData(piece types.Piece, from types.Orientation, to types.Orientati
 
 func IsColliding(pf PlayField, startX float64, startY float64, collisionBox [][]bool) bool {
 	// Check every position occupied in a collision box and see if it is touching the bottom, sides or another mino
-	for row := 0; row < len(collisionBox); row++ {
+	for row := len(collisionBox) - 1; row >= 0; row-- {
 		realRow := int(startY) + row
 
-		for col := 0; col < len(collisionBox[0]); col++ {
+		for col := len(collisionBox) - 1; col >= 0; col-- {
 			realCol := int(startX) + col
 
 			// If the piece isnt colliding in this position

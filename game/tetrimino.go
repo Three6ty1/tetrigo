@@ -18,7 +18,6 @@ type Tetrimino interface {
 	GetColor() types.Mino
 	GetPosition() *types.Vector
 	SetPosition(x float64, y float64)
-	GetOrientation() types.Orientation
 	GetMatrix() [][]bool
 	Rotate(isLeft bool)
 	Rotater(o types.Orientation) [][]bool
@@ -101,8 +100,4 @@ func (t Piece) TryRotateRight(o types.Orientation) types.Orientation {
 	}
 
 	return new
-}
-
-func (t Piece) GetOrientation() types.Orientation {
-	return t.orientation
 }

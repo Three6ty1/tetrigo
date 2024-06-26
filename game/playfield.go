@@ -60,7 +60,7 @@ func (pf *PlayField) Draw(screen *ebiten.Image, gameScale float64) {
 	// Have to set this because we don't know until runtime what the offset is for the window
 	if pf.minoOffset == 0.0 {
 		pf.minoOffset = bw * gameScale / 12
-		pf.playfieldStart = *types.NewVector(startX, startY-pf.minoOffset*2)
+		pf.playfieldStart = *types.NewVector(startX+pf.minoOffset, startY-pf.minoOffset)
 	}
 
 	screen.DrawImage(boardImg, op)
@@ -78,8 +78,8 @@ func (pf PlayField) drawStack(screen *ebiten.Image, gameScale float64) {
 				continue
 			}
 			// +1 due to upper border
-			x = pf.playfieldStart.X + (float64(pf.minoOffset) * float64(col+1))
-			y = pf.playfieldStart.Y + (float64(pf.minoOffset) * float64(row+1))
+			x = pf.playfieldStart.X + (float64(pf.minoOffset) * float64(col))
+			y = pf.playfieldStart.Y + (float64(pf.minoOffset) * float64(row))
 
 			op.GeoM.Translate(x, y)
 
@@ -107,15 +107,17 @@ func (pf PlayField) drawStack(screen *ebiten.Image, gameScale float64) {
 
 func (pf *PlayField) UpdateStack(t Tetrimino) error {
 	startPos := t.GetPosition()
+
+	fmt.Printf("%v\n", startPos)
 	collisionBox := t.GetMatrix()
 	color := t.GetColor()
 
-	// Check every position occupied in a collision box and see if it is touching the bottom, sides or another mino
+	// Insert the tetrimino into the stack
 	for row := 0; row < len(collisionBox); row++ {
-		realRow := int(startPos.Y) + row - 1
+		realRow := int(startPos.Y) + row
 
 		for col := 0; col < len(collisionBox[0]); col++ {
-			realCol := int(startPos.X) + col - 1
+			realCol := int(startPos.X) + col
 
 			// If the piece isnt colliding in this position
 			if !collisionBox[row][col] {
@@ -123,11 +125,11 @@ func (pf *PlayField) UpdateStack(t Tetrimino) error {
 			}
 
 			// Out of bounds
-			if realRow < 0 || realCol < 0 {
+			if realRow <= 0 {
 				return fmt.Errorf("out of bounds: Game Over")
 			}
 
-			if pf.stack[realRow][realCol] != types.None && collisionBox[row][col] {
+			if (realRow > len(pf.stack) || realCol > len(pf.stack[0])) || (pf.stack[realRow][realCol] != types.None && collisionBox[row][col]) {
 				return fmt.Errorf("tried to insert Tetrimino into non-empty space in stack at position: X: %v Y:%v", realRow, realCol)
 			}
 

@@ -25,8 +25,8 @@ func (h Hold) Draw(screen *ebiten.Image, pfStart types.Vector, minoOffset float6
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(gameScale, gameScale)
 
-	x := pfStart.X - float64(minoOffset*5)
-	y := pfStart.Y + minoOffset*3
+	x := pfStart.X - float64(minoOffset*7)
+	y := pfStart.Y + minoOffset*2
 
 	op.GeoM.Translate(x, y)
 
@@ -45,7 +45,12 @@ func (h *Hold) Swap(t Tetrimino) Tetrimino {
 	new := h.piece
 	h.piece = t
 	t.SetPosition(StartingX, StartingY)
-	t.SetOrientation(types.O0)
+
+	// Rotate to default orientation
+	for t.GetOrientation() != types.O0 {
+		t.Rotate(true)
+	}
+
 	h.canHold = false
 	return new
 }

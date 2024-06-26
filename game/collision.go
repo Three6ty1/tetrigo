@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-
 	"github.com/Three6ty1/tetrigo/types"
 )
 
@@ -50,13 +48,13 @@ func getOffsetData(piece types.Piece, from types.Orientation, to types.Orientati
 func IsColliding(pf PlayField, startX float64, startY float64, collisionBox [][]bool) bool {
 	// Check every position occupied in a collision box and see if it is touching the bottom, sides or another mino
 	for row := 0; row < len(collisionBox); row++ {
-		realRow := int(startY) + row - 1
+		realRow := int(startY) + row
 
 		for col := 0; col < len(collisionBox[0]); col++ {
-			realCol := int(startX) + col - 1
+			realCol := int(startX) + col
 
 			// If the piece isnt colliding in this position
-			if !collisionBox[row][col] || realRow == -1 {
+			if !collisionBox[row][col] {
 				continue
 			}
 
@@ -86,9 +84,6 @@ func RotateKicker(pf PlayField, t Tetrimino, isLeft bool) (types.Vector, bool) {
 	var x, y float64
 
 	offsetData := getOffsetData(types.Piece(t.GetColor()), from, to)
-
-	fmt.Printf("NEW TURN\n")
-	fmt.Printf("%v\n", offsetData)
 
 	for i := 0; i < 5; i++ {
 		x = startPos.X + float64(offsetData[i][0])

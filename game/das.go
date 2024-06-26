@@ -14,12 +14,12 @@ func NewDelayAutoShift() *DelayAutoShift {
 	}
 }
 
-func (d *DelayAutoShift) MovementKeyPressed(isLeft bool, tick uint) {
+func (d *DelayAutoShift) InitiateDAS(isLeft bool, tick uint) {
 	d.isLeft = isLeft
 	d.startTick = tick
 }
 
-func (d *DelayAutoShift) IsActivateDAS(isLeft bool, tick uint) bool {
+func (d *DelayAutoShift) IsDASActive(isLeft bool, tick uint) bool {
 	if isLeft != d.isLeft {
 		return false
 	}
@@ -27,9 +27,7 @@ func (d *DelayAutoShift) IsActivateDAS(isLeft bool, tick uint) bool {
 	// Deal with uint wrapping
 	if tick < d.startTick && tick < uint(d.dasDelay) {
 		return tick >= d.startTick+uint(d.dasDelay)-^uint(0) // TODO: fix this seems unsafe
-	} else {
-		return tick >= d.startTick+uint(d.dasDelay)
 	}
-}
 
-// remember wrapping tick based on limit of uint
+	return tick >= d.startTick+uint(d.dasDelay)
+}

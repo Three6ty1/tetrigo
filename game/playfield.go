@@ -129,7 +129,7 @@ func (pf *PlayField) UpdateStack(t Tetrimino) error {
 				return fmt.Errorf("out of bounds: Game Over")
 			}
 
-			if (realRow > len(pf.stack) || realCol > len(pf.stack[0])) || (pf.stack[realRow][realCol] != types.None && collisionBox[row][col]) {
+			if (realRow >= len(pf.stack) || realCol >= len(pf.stack[0])) || (pf.stack[realRow][realCol] != types.None && collisionBox[row][col]) {
 				return fmt.Errorf("tried to insert Tetrimino into non-empty space in stack at position: X: %v Y:%v", realRow, realCol)
 			}
 

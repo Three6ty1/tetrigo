@@ -154,27 +154,28 @@ func (g *Game) DrawActive(screen *ebiten.Image, pfStart types.Vector, minoOffset
 	y := pfStart.Y + (float64(minoOffset) * tPosition.Y)
 
 	// Deep copy the op
-	g.drawGhost(screen, x, y, op)
+	g.drawGhost(screen, pfStart, minoOffset, *op)
 
 	op.GeoM.Translate(x, y)
 
 	screen.DrawImage(g.active.GetSprite(), op)
 }
 
-func (g *Game) drawGhost(screen *ebiten.Image, x float64, y float64, op *ebiten.DrawImageOptions) {
+func (g *Game) drawGhost(screen *ebiten.Image, pfStart types.Vector, minoOffset float64, op ebiten.DrawImageOptions) {
 	collisionBox := g.active.GetMatrix()
-	for !game.IsColliding(*g.playfield, x, y+1, collisionBox) {
+	tPosition := g.active.GetPosition()
+	y := tPosition.Y
+	for !game.IsColliding(*g.playfield, tPosition.X, y+1, collisionBox) {
 		y++
-		fmt.Printf("%v\n", y)
 	}
 
+	x := pfStart.X + (float64(minoOffset) * tPosition.X)
+	y = pfStart.Y + (float64(minoOffset) * y)
+
 	op.GeoM.Translate(x, y)
-	op.ColorScale.ScaleAlpha(0.5)
+	op.ColorScale.ScaleAlpha(0.4)
 
-	screen.DrawImage(g.active.GetSprite(), op)
-
-	op.GeoM.Translate(-x, -y)
-	op.ColorScale.ScaleAlpha(1)
+	screen.DrawImage(g.active.GetSprite(), &op)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

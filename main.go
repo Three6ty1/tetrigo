@@ -12,7 +12,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-var GameScale = 0.25
+var GameScale = 0.5
 
 type Game struct {
 	tick      uint
@@ -184,7 +184,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	ebiten.SetWindowSize(800, 450)
+	// ebiten.SetWindowSize(800, 450)
+	ebiten.SetWindowSize(1600, 900)
 	ebiten.SetWindowTitle("Tetrigo")
 
 	g := &Game{

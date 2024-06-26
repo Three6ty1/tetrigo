@@ -45,6 +45,7 @@ func (h *Hold) Swap(t Tetrimino) Tetrimino {
 	new := h.piece
 	h.piece = t
 	t.SetPosition(StartingX, StartingY)
+	t.SetOrientation(types.O0)
 	h.canHold = false
 	return new
 }

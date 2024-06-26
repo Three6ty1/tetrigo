@@ -25,6 +25,7 @@ type Tetrimino interface {
 	TryRotateRight(o types.Orientation) types.Orientation
 	GetSprite() *ebiten.Image
 	GetOrientation() types.Orientation
+	SetOrientation(o types.Orientation)
 }
 
 type Piece struct {
@@ -61,6 +62,10 @@ func NewTetrimino(p types.Piece) Tetrimino {
 
 func (t Piece) GetOrientation() types.Orientation {
 	return t.orientation
+}
+
+func (t Piece) SetOrientation(o types.Orientation) {
+	t.orientation = o
 }
 
 func (t Piece) GetColor() types.Mino {

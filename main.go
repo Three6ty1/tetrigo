@@ -173,6 +173,7 @@ func controls(g *Game, tick uint) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		g.playfield = game.NewPlayField()
 		g.lock.ResetLockDelay()
+		g.active.SetPosition(game.StartingX, game.StartingY)
 	}
 
 	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {

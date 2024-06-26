@@ -80,6 +80,18 @@ func RotateKicker(pf PlayField, t Tetrimino, isLeft bool) (types.Vector, bool) {
 
 	collisionBox := t.Rotater(to)
 
+	// fmt.Printf("ROTATION\n")
+	// for i := 0; i < len(collisionBox); i++ {
+	// 	for j := 0; j < len(collisionBox); j++ {
+	// 		if collisionBox[i][j] {
+	// 			fmt.Printf("X")
+	// 		} else {
+	// 			fmt.Printf("_")
+	// 		}
+	// 	}
+	// 	fmt.Printf("\n")
+	// }
+
 	startPos := t.GetPosition()
 	var x, y float64
 
@@ -87,7 +99,7 @@ func RotateKicker(pf PlayField, t Tetrimino, isLeft bool) (types.Vector, bool) {
 
 	for i := 0; i < 5; i++ {
 		x = startPos.X + float64(offsetData[i][0])
-		y = startPos.Y + float64(offsetData[i][1])
+		y = startPos.Y - float64(offsetData[i][1])
 
 		if !IsColliding(pf, x, y, collisionBox) {
 			return *types.NewVector(x, y), true

@@ -16,7 +16,7 @@ const TetriminoPath = "./assets/tetriminos/"
 
 type Tetrimino interface {
 	GetColor() types.Mino
-	GetPosition() *types.Vector
+	GetPosition() types.Vector
 	SetPosition(x float64, y float64)
 	GetMatrix() [][]bool
 	Rotate(isLeft bool)
@@ -25,7 +25,6 @@ type Tetrimino interface {
 	TryRotateRight(o types.Orientation) types.Orientation
 	GetSprite() *ebiten.Image
 	GetOrientation() types.Orientation
-	SetOrientation(o types.Orientation)
 }
 
 type Piece struct {
@@ -64,16 +63,12 @@ func (t Piece) GetOrientation() types.Orientation {
 	return t.orientation
 }
 
-func (t Piece) SetOrientation(o types.Orientation) {
-	t.orientation = o
-}
-
 func (t Piece) GetColor() types.Mino {
 	return t.color
 }
 
-func (t Piece) GetPosition() *types.Vector {
-	return t.position
+func (t Piece) GetPosition() types.Vector {
+	return *t.position
 }
 
 func (t *Piece) SetPosition(x float64, y float64) {

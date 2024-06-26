@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"log"
+	"slices"
 
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -27,7 +28,7 @@ type PlayField struct {
 }
 
 func NewPlayField() *PlayField {
-	s := make([][]types.Mino, 20)
+	s := make([][]types.Mino, 22)
 
 	for i := range s {
 		s[i] = make([]types.Mino, 10)
@@ -59,7 +60,7 @@ func (pf *PlayField) Draw(screen *ebiten.Image, gameScale float64) {
 	// Have to set this because we don't know until runtime what the offset is for the window
 	if pf.minoOffset == 0.0 {
 		pf.minoOffset = bw * gameScale / 12
-		pf.playfieldStart = *types.NewVector(startX, startY)
+		pf.playfieldStart = *types.NewVector(startX, startY-pf.minoOffset*2)
 	}
 
 	screen.DrawImage(boardImg, op)
@@ -138,7 +139,25 @@ func (pf *PlayField) UpdateStack(t Tetrimino) error {
 }
 
 func (pf *PlayField) ClearLines() {
+	// Check each row to see if there is an empty space
+	s := make([][]types.Mino, 22)
 
+	curr := 21
+
+	for i := 21; i >= 0; i-- {
+		if slices.Contains(pf.stack[i], types.None) {
+			s[curr] = pf.stack[i]
+			curr--
+		}
+	}
+
+	fmt.Printf("Cleared %v lines\n", curr+1)
+
+	for i := curr; i >= 0; i-- {
+		s[i] = make([]types.Mino, 10)
+	}
+
+	pf.stack = s
 }
 
 func initImages() {

@@ -31,6 +31,17 @@ func NewOPiece() *OPiece {
 	}
 }
 
+func (t *OPiece) Rotate(isLeft bool) {
+	if isLeft {
+		t.orientation = t.TryRotateLeft(t.orientation)
+		t.matrix = t.Rotater(t.orientation)
+	} else {
+		t.orientation = t.TryRotateRight(t.orientation)
+		t.matrix = t.Rotater(t.orientation)
+	}
+
+}
+
 // No Rotation
 func (t OPiece) Rotater(o types.Orientation) [][]bool {
 	return [][]bool{

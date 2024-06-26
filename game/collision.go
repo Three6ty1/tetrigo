@@ -1,9 +1,50 @@
 package game
 
-import "github.com/Three6ty1/tetrigo/types"
+import (
+	"fmt"
+
+	"github.com/Three6ty1/tetrigo/types"
+)
+
+func getOrientationData(piece types.Piece, o types.Orientation) [][]int32 {
+	var data [][]int32
+	if piece == types.IPiece {
+		switch o {
+		case types.O0:
+			data = [][]int32{{0, 0}, {-1, 0}, {+2, 0}, {-1, 0}, {+2, 0}}
+		case types.O90:
+			data = [][]int32{{-1, 0}, {0, 0}, {0, 0}, {0, +1}, {0, -2}}
+		case types.O180:
+			data = [][]int32{{-1, +1}, {+1, +1}, {-2, +1}, {+1, 0}, {-2, 0}}
+		case types.O270:
+			data = [][]int32{{0, +1}, {0, +1}, {0, +1}, {0, -1}, {0, +2}}
+		}
+	} else {
+		switch o {
+		case types.O0:
+			data = [][]int32{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+		case types.O90:
+			data = [][]int32{{0, 0}, {+1, 0}, {+1, -1}, {0, +2}, {+1, +2}}
+		case types.O180:
+			data = [][]int32{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}
+		case types.O270:
+			data = [][]int32{{0, 0}, {-1, 0}, {-1, -1}, {0, +2}, {-1, +2}}
+		}
+	}
+	return data
+}
 
 func getOffsetData(piece types.Piece, from types.Orientation, to types.Orientation) [][]int32 {
-	return nil
+	offsets := getOrientationData(piece, from)
+	toData := getOrientationData(piece, to)
+
+	// 5 offsets
+	for i := 0; i < 5; i++ {
+		offsets[i][0] -= toData[i][0]
+		offsets[i][1] -= toData[i][1]
+	}
+
+	return offsets
 }
 
 func IsColliding(pf PlayField, startX float64, startY float64, collisionBox [][]bool) bool {
@@ -30,7 +71,33 @@ func IsColliding(pf PlayField, startX float64, startY float64, collisionBox [][]
 	return false
 }
 
-// func RotateKicker(pf PlayField, float64, startY float64, collisionBox [][]bool) (float64, float64, bool) {
-// 	var x, y float64
-// 	const dir = BadExpr
-// }
+func RotateKicker(pf PlayField, t Tetrimino, isLeft bool) (types.Vector, bool) {
+	from := t.GetOrientation()
+	var to types.Orientation
+	if isLeft {
+		to = t.TryRotateLeft(from)
+	} else {
+		to = t.TryRotateRight(from)
+	}
+
+	collisionBox := t.Rotater(to)
+
+	startPos := t.GetPosition()
+	var x, y float64
+
+	offsetData := getOffsetData(types.Piece(t.GetColor()), from, to)
+
+	fmt.Printf("NEW TURN\n")
+	fmt.Printf("%v\n", offsetData)
+
+	for i := 0; i < 5; i++ {
+		x = startPos.X + float64(offsetData[i][0])
+		y = startPos.Y + float64(offsetData[i][1])
+
+		if !IsColliding(pf, x, y, collisionBox) {
+			return *types.NewVector(x, y), true
+		}
+	}
+
+	return *types.NewVector(-1, -1), false
+}

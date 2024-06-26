@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/Three6ty1/tetrigo/game"
 	"github.com/Three6ty1/tetrigo/types"
@@ -11,12 +12,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-var GameScale = 0.5
+var GameScale = 0.25
 
 type Game struct {
-	tick  uint
-	queue *game.TetriminoQueue
-	// held tetrimino
+	tick      uint
+	queue     *game.TetriminoQueue
+	hold      *game.Hold
 	lines     uint32
 	state     GameState
 	playfield *game.PlayField
@@ -64,8 +65,9 @@ func handleDrop(g *Game) {
 			log.Fatal(err)
 		}
 
-		// Queue up the next tetrimino
+		g.playfield.ClearLines()
 		g.active = g.queue.Next()
+		g.hold.ResetCanHold()
 
 	} else {
 		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
@@ -77,12 +79,12 @@ func controls(g *Game, tick uint) {
 	currentPosition := currentTetrimino.GetPosition()
 	currentMatrix := currentTetrimino.GetMatrix()
 	// TODO: Change to hotkeys
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%3 == 0 {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%4 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
 		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%3 == 0 {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%4 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
 		}
@@ -90,21 +92,39 @@ func controls(g *Game, tick uint) {
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && tick%2 == 0 {
 		handleDrop(g)
 
-	} else if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		current := g.active
 		for current == g.active {
 			handleDrop(g)
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-		// rotatedMatrix, _ := currentTetrimino.TryRotateLeft()
-
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyX) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		newPos, valid := game.RotateKicker(*g.playfield, g.active, true)
+		if valid {
+			g.active.SetPosition(newPos.X, newPos.Y)
+			g.active.Rotate(true)
+		}
 
 	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		newPos, valid := game.RotateKicker(*g.playfield, g.active, false)
+		if valid {
+			g.active.SetPosition(newPos.X, newPos.Y)
+			g.active.Rotate(false)
+		}
+	}
 
-	// else if inpututil.IsKeyJustPressed(ebiten.KeyShift) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyShift) || inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		if g.hold.CanHold() {
+			g.active = g.hold.Swap(g.active)
 
+			// First swap
+			if g.active == nil {
+				g.active = g.queue.Next()
+			}
+		}
+	}
 	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 
 	// }
@@ -117,19 +137,44 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.playfield.Draw(screen, GameScale)
 	g.DrawActive(screen, pfStart, minoOffset)
 	g.queue.Draw(screen, pfStart, minoOffset, GameScale)
+	g.hold.Draw(screen, pfStart, minoOffset, GameScale)
 }
 
 func (g *Game) DrawActive(screen *ebiten.Image, pfStart types.Vector, minoOffset float64) {
 	op := &ebiten.DrawImageOptions{}
+	s := g.active.GetSprite().Bounds().Size()
+
+	op.GeoM.Translate(-float64(s.X)/2, -float64(s.Y)/2)
+	op.GeoM.Rotate((90 * float64(g.active.GetOrientation())) * (math.Pi / 180))
+	op.GeoM.Translate(float64(s.X)/2, float64(s.Y)/2)
 	op.GeoM.Scale(GameScale, GameScale)
 
 	tPosition := g.active.GetPosition()
 	x := pfStart.X + (float64(minoOffset) * tPosition.X)
 	y := pfStart.Y + (float64(minoOffset) * tPosition.Y)
 
+	// Deep copy the op
+	g.drawGhost(screen, x, y, op)
+
 	op.GeoM.Translate(x, y)
 
 	screen.DrawImage(g.active.GetSprite(), op)
+}
+
+func (g *Game) drawGhost(screen *ebiten.Image, x float64, y float64, op *ebiten.DrawImageOptions) {
+	collisionBox := g.active.GetMatrix()
+	for !game.IsColliding(*g.playfield, x, y+1, collisionBox) {
+		y++
+		fmt.Printf("%v\n", y)
+	}
+
+	op.GeoM.Translate(x, y)
+	op.ColorScale.ScaleAlpha(0.5)
+
+	screen.DrawImage(g.active.GetSprite(), op)
+
+	op.GeoM.Translate(-x, -y)
+	op.ColorScale.ScaleAlpha(1)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -138,7 +183,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	ebiten.SetWindowSize(1600, 900)
+	ebiten.SetWindowSize(800, 450)
 	ebiten.SetWindowTitle("Tetrigo")
 
 	g := &Game{
@@ -146,6 +191,7 @@ func main() {
 		state:     playing,
 		playfield: game.NewPlayField(),
 		queue:     game.NewTetriminoQueue(),
+		hold:      game.NewHold(),
 		active:    nil,
 	}
 

@@ -24,6 +24,7 @@ type Game struct {
 	playfield *game.PlayField
 	active    game.Tetrimino
 	das       *game.DelayAutoShift
+	lock      *game.LockDelay
 }
 
 type Direction bool
@@ -48,23 +49,32 @@ func (g *Game) Update() error {
 		g.tick = 0
 	}
 
+	if g.lock.IsLockActive(g.tick) {
+		handleDrop(g, true)
+	}
+
 	controls(g, g.tick)
 
 	// Natural block falling
 	if g.tick%15 == 0 {
-		handleDrop(g)
+		handleDrop(g, false)
 	}
 
 	return nil
 }
 
-func handleDrop(g *Game) bool {
+func handleDrop(g *Game, isHardDrop bool) bool {
 	currentTetrimino := g.active
 	currentPosition := currentTetrimino.GetPosition()
 
 	if game.IsColliding(*g.playfield, currentPosition.X, currentPosition.Y+1, currentTetrimino.GetMatrix()) {
+
+		if !isHardDrop && !g.lock.IsLockActive(g.tick) {
+			g.lock.InitiateLockDelay(g.tick)
+			return false
+		}
+
 		fmt.Printf("Updating stack Tick: %v\n", g.tick)
-		// TODO: Switch to delay based hard drop
 		// Drop the tetrimino on the stack
 		err := g.playfield.UpdateStack(currentTetrimino)
 		if err != nil {
@@ -74,7 +84,7 @@ func handleDrop(g *Game) bool {
 		g.playfield.ClearLines()
 		g.active = g.queue.Next()
 		g.hold.ResetCanHold()
-
+		g.lock.ResetLockDelay()
 		return true
 	} else {
 		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
@@ -92,34 +102,38 @@ func controls(g *Game, tick uint) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
 		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
-			g.das.MovementKeyPressed(Left, g.tick)
+			g.das.InitiateDAS(Left, g.tick)
+			g.lock.IncrementLockMovement(g.tick)
 		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && g.das.IsActivateDAS(Left, g.tick) && g.tick%2 == 0 {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && g.das.IsDASActive(Left, g.tick) && g.tick%2 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
+			g.lock.IncrementLockMovement(g.tick)
 		}
 	}
 	// MOVE RIGHT
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
 		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
-			g.das.MovementKeyPressed(Right, g.tick)
+			g.das.InitiateDAS(Right, g.tick)
+			g.lock.IncrementLockMovement(g.tick)
 		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && g.das.IsActivateDAS(Right, g.tick) && g.tick%2 == 0 {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && g.das.IsDASActive(Right, g.tick) && g.tick%2 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
+			g.lock.IncrementLockMovement(g.tick)
 		}
 	}
 	// SOFT DROP
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && tick%2 == 0 {
-		handleDrop(g)
-
+		handleDrop(g, false)
+		g.lock.IncrementLockMovement(g.tick)
 	}
 	// HARD DROP
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		for !handleDrop(g) {
+		for !handleDrop(g, true) {
 		}
 	}
 	// TURN LEFT
@@ -128,6 +142,7 @@ func controls(g *Game, tick uint) {
 		if valid {
 			g.active.SetPosition(newPos.X, newPos.Y)
 			g.active.Rotate(Left)
+			g.lock.IncrementLockMovement(g.tick)
 		}
 
 	}
@@ -137,6 +152,7 @@ func controls(g *Game, tick uint) {
 		if valid {
 			g.active.SetPosition(newPos.X, newPos.Y)
 			g.active.Rotate(Right)
+			g.lock.IncrementLockMovement(g.tick)
 		}
 	}
 	// HOLD/SWAP PIECE
@@ -148,12 +164,15 @@ func controls(g *Game, tick uint) {
 			if g.active == nil {
 				g.active = g.queue.Next()
 			}
+
+			g.lock.ResetLockDelay()
 		}
 	}
 
 	// RESET BOARD (TESTING)
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		g.playfield = game.NewPlayField()
+		g.lock.ResetLockDelay()
 	}
 
 	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
@@ -227,6 +246,7 @@ func main() {
 		hold:      game.NewHold(),
 		active:    nil,
 		das:       game.NewDelayAutoShift(),
+		lock:      game.NewLockDelay(15, 32),
 	}
 
 	g.active = g.queue.Next()

@@ -13,6 +13,7 @@ import (
 )
 
 var GameScale = 0.5
+var DAS_DELAY = 10 // in Frames. Ebiten is in 60fps
 
 type Game struct {
 	tick      uint
@@ -22,7 +23,15 @@ type Game struct {
 	state     GameState
 	playfield *game.PlayField
 	active    game.Tetrimino
+	das       *game.DelayAutoShift
 }
+
+type Direction bool
+
+const (
+	Left  = true
+	Right = false
+)
 
 type GameState int32
 
@@ -79,42 +88,60 @@ func controls(g *Game, tick uint) {
 	currentPosition := currentTetrimino.GetPosition()
 	currentMatrix := currentTetrimino.GetMatrix()
 	// TODO: Change to hotkeys
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && tick%4 == 0 {
+	// MOVE LEFT
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
+		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
+			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
+			g.das.MovementKeyPressed(Left, g.tick)
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && g.das.IsActivateDAS(Left, g.tick) && g.tick%2 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X+1, currentPosition.Y)
 		}
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && tick%4 == 0 {
+	// MOVE RIGHT
+	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) {
+		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
+			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
+			g.das.MovementKeyPressed(Right, g.tick)
+		}
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && g.das.IsActivateDAS(Right, g.tick) && g.tick%2 == 0 {
 		if !game.IsColliding(*g.playfield, currentPosition.X-1, currentPosition.Y, currentMatrix) {
 			currentTetrimino.SetPosition(currentPosition.X-1, currentPosition.Y)
 		}
 	}
+	// SOFT DROP
 	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && tick%2 == 0 {
 		handleDrop(g)
 
 	}
+	// HARD DROP
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		current := g.active
 		for current == g.active {
 			handleDrop(g)
 		}
 	}
+	// TURN LEFT
 	if inpututil.IsKeyJustPressed(ebiten.KeyZ) {
-		newPos, valid := game.RotateKicker(*g.playfield, g.active, true)
+		newPos, valid := game.RotateKicker(*g.playfield, g.active, Left)
 		if valid {
 			g.active.SetPosition(newPos.X, newPos.Y)
-			g.active.Rotate(true)
+			g.active.Rotate(Left)
 		}
 
 	}
+	// TURN RIGHT
 	if inpututil.IsKeyJustPressed(ebiten.KeyX) || inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
-		newPos, valid := game.RotateKicker(*g.playfield, g.active, false)
+		newPos, valid := game.RotateKicker(*g.playfield, g.active, Right)
 		if valid {
 			g.active.SetPosition(newPos.X, newPos.Y)
-			g.active.Rotate(false)
+			g.active.Rotate(Right)
 		}
 	}
-
+	// HOLD/SWAP PIECE
 	if inpututil.IsKeyJustPressed(ebiten.KeyShift) || inpututil.IsKeyJustPressed(ebiten.KeyC) {
 		if g.hold.CanHold() {
 			g.active = g.hold.Swap(g.active)
@@ -195,6 +222,7 @@ func main() {
 		queue:     game.NewTetriminoQueue(),
 		hold:      game.NewHold(),
 		active:    nil,
+		das:       game.NewDelayAutoShift(),
 	}
 
 	g.active = g.queue.Next()

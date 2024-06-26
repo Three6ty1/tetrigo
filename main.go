@@ -58,17 +58,14 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func handleDrop(g *Game) {
+func handleDrop(g *Game) bool {
 	currentTetrimino := g.active
 	currentPosition := currentTetrimino.GetPosition()
 
 	if game.IsColliding(*g.playfield, currentPosition.X, currentPosition.Y+1, currentTetrimino.GetMatrix()) {
-		fmt.Printf("Tick: %v\n", g.tick)
-		fmt.Println("Colliding")
-
+		fmt.Printf("Updating stack Tick: %v\n", g.tick)
 		// TODO: Switch to delay based hard drop
 		// Drop the tetrimino on the stack
-		fmt.Println("Updating Stack")
 		err := g.playfield.UpdateStack(currentTetrimino)
 		if err != nil {
 			log.Fatal(err)
@@ -78,8 +75,11 @@ func handleDrop(g *Game) {
 		g.active = g.queue.Next()
 		g.hold.ResetCanHold()
 
+		return true
 	} else {
 		currentTetrimino.SetPosition(currentPosition.X, currentPosition.Y+1)
+
+		return false
 	}
 }
 
@@ -119,9 +119,7 @@ func controls(g *Game, tick uint) {
 	}
 	// HARD DROP
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		current := g.active
-		for current == g.active {
-			handleDrop(g)
+		for !handleDrop(g) {
 		}
 	}
 	// TURN LEFT
@@ -152,6 +150,12 @@ func controls(g *Game, tick uint) {
 			}
 		}
 	}
+
+	// RESET BOARD (TESTING)
+	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
+		g.playfield = game.NewPlayField()
+	}
+
 	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 
 	// }

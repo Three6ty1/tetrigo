@@ -19,4 +19,6 @@ The aim of the project **practice and refresh myself on OO principles mainly on 
 - General UI improvements with graphics
 - Preset levels/Gamemodes for 40 line sprint
 
+
+## YouTube video with gameplay (Will redirect)
 [![Gameplay](https://raw.githubusercontent.com/Three6ty1/tetrigo/main/thumbnail.png)](https://youtu.be/7seR2LTL0XE)

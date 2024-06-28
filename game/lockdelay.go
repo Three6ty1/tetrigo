@@ -1,5 +1,7 @@
 package game
 
+import "fmt"
+
 type LockDelay struct {
 	initiated bool
 	moves     int32
@@ -24,6 +26,7 @@ func (ld *LockDelay) InitiateLockDelay(tick uint) {
 	if ld.initiated {
 		return
 	}
+	fmt.Printf("Lock Started %v\n", tick)
 	ld.initiated = true
 	ld.moves = 0
 	ld.startTick = tick

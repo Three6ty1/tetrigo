@@ -10,7 +10,7 @@ func NewDelayAutoShift() *DelayAutoShift {
 	return &DelayAutoShift{
 		isLeft:    true,
 		startTick: 0,
-		dasDelay:  15, // 60fps ebiten
+		dasDelay:  12, // 60fps ebiten
 	}
 }
 

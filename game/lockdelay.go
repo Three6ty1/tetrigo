@@ -48,7 +48,7 @@ func (ld *LockDelay) IsLockActive(tick uint) bool {
 	}
 
 	if tick < ld.startTick && tick < ld.tickLimit {
-		return tick >= ld.startTick+ld.tickLimit-^uint(0) // TODO: fix this seems unsafe
+		return tick >= ld.startTick+ld.tickLimit-^uint(0)
 	} else {
 		return tick >= ld.startTick+ld.tickLimit
 	}

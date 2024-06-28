@@ -97,7 +97,6 @@ func controls(g *Game, tick uint) {
 	currentTetrimino := g.active
 	currentPosition := currentTetrimino.GetPosition()
 	currentMatrix := currentTetrimino.GetMatrix()
-	// TODO: Change to hotkeys
 	// MOVE LEFT
 	if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) {
 		if !game.IsColliding(*g.playfield, currentPosition.X+1, currentPosition.Y, currentMatrix) {

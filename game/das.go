@@ -26,7 +26,7 @@ func (d *DelayAutoShift) IsDASActive(isLeft bool, tick uint) bool {
 
 	// Deal with uint wrapping
 	if tick < d.startTick && tick < uint(d.dasDelay) {
-		return tick >= d.startTick+uint(d.dasDelay)-^uint(0) // TODO: fix this seems unsafe
+		return tick >= d.startTick+uint(d.dasDelay)-^uint(0)
 	}
 
 	return tick >= d.startTick+uint(d.dasDelay)

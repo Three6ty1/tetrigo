@@ -1,4 +1,4 @@
-package game
+package tetrimino
 
 import (
 	"log"
@@ -8,28 +8,24 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-type LPiece struct {
+type JPiece struct {
 	Piece
 }
 
-func (t *LPiece) GetAltSprite() *ebiten.Image {
-	return t.GetSprite()
-}
-
-func NewLPiece() *LPiece {
-	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "L.png")
+func NewJPiece() *JPiece {
+	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "J.png")
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &LPiece{
+	return &JPiece{
 		Piece: Piece{
-			piece:       types.LPiece,
-			color:       types.Mino(types.LPiece),
+			piece:       types.JPiece,
+			color:       types.Mino(types.JPiece),
 			orientation: types.O0,
 			position:    types.NewVector(StartingX, StartingY),
 			sprite:      s,
 			matrix: [][]bool{
-				{F, F, T},
+				{T, F, F},
 				{T, T, T},
 				{F, F, F},
 			},
@@ -37,7 +33,11 @@ func NewLPiece() *LPiece {
 	}
 }
 
-func (t *LPiece) Rotate(isLeft bool) {
+func (t *JPiece) GetAltSprite() *ebiten.Image {
+	return t.GetSprite()
+}
+
+func (t *JPiece) Rotate(isLeft bool) {
 	if isLeft {
 		t.orientation = t.TryRotateLeft(t.orientation)
 		t.matrix = t.Rotater(t.orientation)
@@ -48,31 +48,31 @@ func (t *LPiece) Rotate(isLeft bool) {
 
 }
 
-func (t LPiece) Rotater(o types.Orientation) [][]bool {
+func (t JPiece) Rotater(o types.Orientation) [][]bool {
 	switch o {
 	case types.O0:
 		return [][]bool{
-			{F, F, T},
+			{T, F, F},
 			{T, T, T},
 			{F, F, F},
 		}
 	case types.O90:
 		return [][]bool{
-			{F, T, F},
-			{F, T, F},
 			{F, T, T},
+			{F, T, F},
+			{F, T, F},
 		}
 	case types.O180:
 		return [][]bool{
 			{F, F, F},
 			{T, T, T},
-			{T, F, F},
+			{F, F, T},
 		}
 	default:
 		return [][]bool{
+			{F, T, F},
+			{F, T, F},
 			{T, T, F},
-			{F, T, F},
-			{F, T, F},
 		}
 	}
 }

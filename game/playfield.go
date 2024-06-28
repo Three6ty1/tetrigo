@@ -5,6 +5,7 @@ import (
 	"log"
 	"slices"
 
+	"github.com/Three6ty1/tetrigo/game/tetrimino"
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -132,7 +133,7 @@ func (pf PlayField) drawStack(screen *ebiten.Image, gameScale float64) {
 	}
 }
 
-func (pf *PlayField) UpdateStack(t Tetrimino) error {
+func (pf *PlayField) UpdateStack(t tetrimino.Tetrimino) error {
 	startPos := t.GetPosition()
 
 	fmt.Printf("%v\n", startPos)

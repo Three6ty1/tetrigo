@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/Three6ty1/tetrigo/game/tetrimino"
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -16,17 +17,17 @@ var TEST = false // Enable testing variables
 
 // Queue is 6 long, but only displays 5
 type TetriminoQueue struct {
-	queue []Tetrimino
-	next  []Tetrimino
+	queue []tetrimino.Tetrimino
+	next  []tetrimino.Tetrimino
 }
 
-func newQueue() *[]Tetrimino {
+func newQueue() *[]tetrimino.Tetrimino {
 	// https://tetris.fandom.com/wiki/Random_Generator
 	// 7-piece bag
-	q := make([]Tetrimino, 0)
+	q := make([]tetrimino.Tetrimino, 0)
 
 	for i := 1; i <= 7; i++ {
-		q = append(q, NewTetrimino(types.Piece(i)))
+		q = append(q, tetrimino.NewTetrimino(types.Piece(i)))
 	}
 
 	r.Shuffle(len(q), func(i, j int) {
@@ -53,7 +54,7 @@ func NewTetriminoQueue() *TetriminoQueue {
 	return tq
 }
 
-func (tq *TetriminoQueue) Next() Tetrimino {
+func (tq *TetriminoQueue) Next() tetrimino.Tetrimino {
 	// https://stackoverflow.com/a/26863706
 	next := tq.queue[0]
 	tq.queue = tq.queue[1:]
@@ -71,7 +72,7 @@ func (tq *TetriminoQueue) Next() Tetrimino {
 }
 
 func (tq TetriminoQueue) Draw(screen *ebiten.Image, pfStart types.Vector, minoOffset float64, gameScale float64) {
-	var q []Tetrimino
+	var q []tetrimino.Tetrimino
 
 	q = append(q, tq.queue...)
 	q = append(q, tq.next[:7-len(tq.queue)]...)
@@ -99,11 +100,11 @@ func (tq TetriminoQueue) Draw(screen *ebiten.Image, pfStart types.Vector, minoOf
 }
 
 // Testing function
-func newTestQueue() *[]Tetrimino {
-	q := make([]Tetrimino, 0)
+func newTestQueue() *[]tetrimino.Tetrimino {
+	q := make([]tetrimino.Tetrimino, 0)
 
 	for i := 1; i <= 7; i++ {
-		q = append(q, NewSPiece())
+		q = append(q, tetrimino.NewSPiece())
 	}
 
 	return &q

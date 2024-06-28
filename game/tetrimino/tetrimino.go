@@ -1,4 +1,4 @@
-package game
+package tetrimino
 
 import (
 	_ "image/png"
@@ -10,7 +10,7 @@ import (
 const T = true
 const F = false
 
-const StartingX = 5
+const StartingX = 4
 const StartingY = 0
 const TetriminoPath = "./assets/tetriminos/"
 

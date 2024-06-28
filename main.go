@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/Three6ty1/tetrigo/game"
+	"github.com/Three6ty1/tetrigo/game/tetrimino"
 	"github.com/Three6ty1/tetrigo/types"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -22,7 +23,7 @@ type Game struct {
 	lines     uint32
 	state     GameState
 	playfield *game.PlayField
-	active    game.Tetrimino
+	active    tetrimino.Tetrimino
 	das       *game.DelayAutoShift
 	lock      *game.LockDelay
 }
@@ -172,7 +173,7 @@ func controls(g *Game, tick uint) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		g.playfield = game.NewPlayField()
 		g.lock.ResetLockDelay()
-		g.active.SetPosition(game.StartingX, game.StartingY)
+		g.active.SetPosition(tetrimino.StartingX, tetrimino.StartingY)
 	}
 
 	// } else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {

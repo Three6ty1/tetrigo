@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/Three6ty1/tetrigo/game/tetrimino"
 	"github.com/Three6ty1/tetrigo/types"
 )
 
@@ -69,7 +70,7 @@ func IsColliding(pf PlayField, startX float64, startY float64, collisionBox [][]
 	return false
 }
 
-func RotateKicker(pf PlayField, t Tetrimino, isLeft bool) (types.Vector, bool) {
+func RotateKicker(pf PlayField, t tetrimino.Tetrimino, isLeft bool) (types.Vector, bool) {
 	from := t.GetOrientation()
 	var to types.Orientation
 	if isLeft {

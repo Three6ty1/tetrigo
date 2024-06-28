@@ -1,12 +1,13 @@
 package game
 
 import (
+	"github.com/Three6ty1/tetrigo/game/tetrimino"
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Hold struct {
-	piece   Tetrimino
+	piece   tetrimino.Tetrimino
 	canHold bool
 }
 
@@ -41,10 +42,10 @@ func (h *Hold) ResetCanHold() {
 	h.canHold = true
 }
 
-func (h *Hold) Swap(t Tetrimino) Tetrimino {
+func (h *Hold) Swap(t tetrimino.Tetrimino) tetrimino.Tetrimino {
 	new := h.piece
 	h.piece = t
-	t.SetPosition(StartingX, StartingY)
+	t.SetPosition(tetrimino.StartingX, tetrimino.StartingY)
 
 	// Rotate to default orientation
 	for t.GetOrientation() != types.O0 {

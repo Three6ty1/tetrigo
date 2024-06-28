@@ -1,13 +1,11 @@
 package game
 
 import (
-	"image/color"
 	"math/rand"
 	"time"
 
 	"github.com/Three6ty1/tetrigo/types"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -93,13 +91,8 @@ func (tq TetriminoQueue) Draw(screen *ebiten.Image, pfStart types.Vector, minoOf
 
 		y = qStartY + (minoOffset*3)*float64(i)
 
-		// TODO: Remove. Here for stack debugging
-		if i > len(tq.queue) {
-			vector.DrawFilledRect(screen, float32(qStartX), float32(y), 50.0, 2.0, color.RGBA{255, 0, 0, 255}, false)
-		}
-
 		op.GeoM.Translate(0, y)
-		screen.DrawImage(q[i].GetSprite(), op)
+		screen.DrawImage(q[i].GetAltSprite(), op)
 		op.GeoM.Translate(0, -y)
 	}
 

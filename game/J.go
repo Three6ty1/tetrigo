@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Three6ty1/tetrigo/types"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -30,6 +31,10 @@ func NewJPiece() *JPiece {
 			},
 		},
 	}
+}
+
+func (t *JPiece) GetAltSprite() *ebiten.Image {
+	return t.GetSprite()
 }
 
 func (t *JPiece) Rotate(isLeft bool) {

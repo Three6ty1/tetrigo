@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Three6ty1/tetrigo/types"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -11,8 +12,14 @@ type IPiece struct {
 	Piece
 }
 
+var IAltSprite *ebiten.Image
+
 func NewIPiece() *IPiece {
 	s, _, err := ebitenutil.NewImageFromFile(TetriminoPath + "I.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	IAltSprite, _, err = ebitenutil.NewImageFromFile(TetriminoPath + "I_ALT.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,6 +39,10 @@ func NewIPiece() *IPiece {
 			},
 		},
 	}
+}
+
+func (t *IPiece) GetAltSprite() *ebiten.Image {
+	return IAltSprite
 }
 
 func (t *IPiece) Rotate(isLeft bool) {

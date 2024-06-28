@@ -4,11 +4,16 @@ import (
 	"log"
 
 	"github.com/Three6ty1/tetrigo/types"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type ZPiece struct {
 	Piece
+}
+
+func (t *ZPiece) GetAltSprite() *ebiten.Image {
+	return t.GetSprite()
 }
 
 func NewZPiece() *ZPiece {

@@ -25,6 +25,7 @@ type Tetrimino interface {
 	TryRotateRight(o types.Orientation) types.Orientation
 	GetSprite() *ebiten.Image
 	GetOrientation() types.Orientation
+	GetAltSprite() *ebiten.Image
 }
 
 type Piece struct {

@@ -25,12 +25,12 @@ func (h Hold) Draw(screen *ebiten.Image, pfStart types.Vector, minoOffset float6
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Scale(gameScale, gameScale)
 
-	x := pfStart.X - float64(minoOffset*7)
+	x := pfStart.X - float64(minoOffset*5)
 	y := pfStart.Y + minoOffset*2
 
 	op.GeoM.Translate(x, y)
 
-	screen.DrawImage(h.piece.GetSprite(), op)
+	screen.DrawImage(h.piece.GetAltSprite(), op)
 }
 
 func (h Hold) CanHold() bool {

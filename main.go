@@ -237,7 +237,7 @@ func main() {
 	// ebiten.SetWindowSize(800, 450)
 	ebiten.SetWindowSize(1600, 900)
 	ebiten.SetWindowTitle("Tetrigo")
-
+	// ebiten.SetFullscreen(true)
 	g := &Game{
 		lines:     0,
 		state:     playing,

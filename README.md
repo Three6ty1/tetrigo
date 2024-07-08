@@ -19,6 +19,18 @@ The aim of the project **practice and refresh myself on OO principles mainly on 
 - General UI improvements with graphics
 - Preset levels/Gamemodes for 40 line sprint
 
-
 ## YouTube video with gameplay (Will redirect)
 [![Gameplay](https://raw.githubusercontent.com/Three6ty1/tetrigo/main/thumbnail.png)](https://youtu.be/7seR2LTL0XE)
+
+## How to play
+- Download onto PC
+- Install Go version [1.22.4](https://go.dev/doc/devel/release#go1.22.0)
+- Change into the repo directory and run the game using ```go run main.go```
+
+### Controls
+- Left/Right arrow keys to move
+  - Hold arrow keys for Delay Auto Shift
+- Up/X key to Rotate clockwise
+- Z key to Rotate counter-clockwise
+- Shift/C to Hold
+- R to reset the board
